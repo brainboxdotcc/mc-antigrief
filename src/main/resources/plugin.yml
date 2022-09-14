@@ -1,0 +1,16 @@
+main: cc.brainbox.AntiGrief.main
+name: AntiGriefPlugin
+version: 1.0.0
+description: Anti-Griefing utilities for Brainbox.cc minecraft server
+api-version: 1.19
+Author: Craig Edwards
+
+commands:
+  protected:
+    description: Check if a player is in a protected safe zone
+    usage: /protected <player name>
+    permission: AntiGriefPlugin.permission
+  wilderness:
+    description: Teleports you into a random wilderness location away from the safe zone
+    usage: /wilderness
+    permission: AntiGriefPlugin.permission
