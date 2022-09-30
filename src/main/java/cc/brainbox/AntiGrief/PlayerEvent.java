@@ -1,12 +1,7 @@
 package cc.brainbox.AntiGrief;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -71,7 +66,7 @@ public class PlayerEvent implements Listener {
      */
     private void setAdventure(Player player) {
         player.setGameMode(GameMode.ADVENTURE);
-        player.sendMessage(ChatColor.GREEN + "You are in a safe zone. Please head away from this area for survival mode.");
+        player.sendMessage(ChatColor.GREEN + "You are in a safe zone. Please head away from this area for survival mode and PVP.");
         Bukkit.getLogger().info("Entered " + ChatColor.GREEN + "safe zone" + ChatColor.RESET + ": " + this.getPlayerName(player));
 
         /* Remove items from inventory that are banned in safe zones */
@@ -149,9 +144,22 @@ public class PlayerEvent implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        String name = this.getPlayerName(event.getPlayer());
+        Player player = event.getPlayer();
+        String name = this.getPlayerName(player);
+        int x = player.getLocation().getBlockX();
+        int z = player.getLocation().getBlockZ();
+
+        World world = player.getWorld();
+        boolean isProtected = pc.isProtected(x, z, world);
+
         Bukkit.getLogger().info("AG: Player Join: " + name);
-        this.checkGameMode(event.getPlayer());
+        this.checkGameMode(player);
+
+        if (isProtected) {
+            player.sendMessage(ChatColor.GREEN + "You are in a safe zone. Please head away from this area for survival mode and PVP.");
+        } else {
+            player.sendMessage(ChatColor.RED + "You are in the wilderness! PVP and building are enabled.");
+        }
     }
 
     @EventHandler

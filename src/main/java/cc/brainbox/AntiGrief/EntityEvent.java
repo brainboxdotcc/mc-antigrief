@@ -1,17 +1,14 @@
 package cc.brainbox.AntiGrief;
 
 import io.papermc.paper.event.entity.EntityMoveEvent;
+import io.papermc.paper.event.player.PlayerItemFrameChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Wither;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 
@@ -22,16 +19,39 @@ public class EntityEvent implements Listener {
     /**
      * Prevent PVP in safe zones by cancelling entity damage when caused by a player against a player.
      * Still allows combat with NPC mobs.
-     * @param event
+     * @param event damage event
      */
     @EventHandler
     public void onTestEntityDamage(EntityDamageByEntityEvent event) {
         Location l = event.getEntity().getLocation();
         if (pc.isProtected(l.getBlockX(), l.getBlockZ(), event.getEntity().getWorld())) {
-            if (event.getEntity() instanceof Player && event.getDamager() instanceof Player p) {
+            if (
+                    event.getDamager() instanceof Player p &&
+                    (
+                            event.getEntity() instanceof Player ||
+                            event.getEntity() instanceof ItemFrame ||
+                            event.getEntity() instanceof Villager
+                    )
+                ) {
                 event.setCancelled(true);
-                p.sendMessage(ChatColor.RED + "You cannot PVP inside a safe zone!");
+                if (event.getEntity() instanceof Player) {
+                    p.sendMessage(ChatColor.RED + "Calm down! You cannot PVP inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
+                } else if (event.getEntity() instanceof ItemFrame) {
+                    p.sendMessage(ChatColor.RED + "Hands off! You cannot destroy item frames inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
+                } else if (event.getEntity() instanceof Villager) {
+                    p.sendMessage(ChatColor.RED + "Not cool! Don't attack villagers inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
+                }
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerItemFrameChange(PlayerItemFrameChangeEvent event) {
+        Location l = event.getItemFrame().getLocation();
+        if (pc.isProtected(l.getBlockX(), l.getBlockZ(), event.getItemFrame().getWorld())) {
+            Player p = event.getPlayer();
+            event.setCancelled(true);
+            p.sendMessage(ChatColor.RED + "You cannot loot item frames inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
         }
     }
 
