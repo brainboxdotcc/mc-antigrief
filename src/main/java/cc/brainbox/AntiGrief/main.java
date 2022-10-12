@@ -22,7 +22,8 @@ public class main extends JavaPlugin {
             commandProtected.setExecutor(new CommandProtected());
             commandProtected.setTabCompleter(new CommandProtectedTabComplete());
         }
-        Objects.requireNonNull(this.getCommand("wilderness")).setExecutor(new WildernessCommand());
+        Objects.requireNonNull(this.getCommand("wilderness")).setExecutor(new CommandWilderness());
+        Objects.requireNonNull(this.getCommand("map")).setExecutor(new CommandMap());
 
         Bukkit.getLogger().info("AntiGrief plugin started.");
     }

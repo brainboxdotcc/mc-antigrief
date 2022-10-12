@@ -6,6 +6,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Dispenser;
 import org.bukkit.block.data.type.TNT;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.Cancellable;
@@ -13,6 +14,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -28,15 +31,40 @@ public class BlockEvent implements Listener {
         }
     }
 
+    /**
+     * Returns true if this event refers to a block in a protected area
+     * @param event block event
+     * @return boolean
+     */
     private boolean checkShouldProtectBlock(org.bukkit.event.block.BlockEvent event) {
         Location l = event.getBlock().getLocation();
         return (pc.isProtected(l.getBlockX(), l.getBlockZ(), event.getBlock().getWorld()));
     }
 
+    /**
+     * Prevent placing of blocks in survival in protected areas.
+     * This is a safeguard just in case somehow they manage to get out of adventure mode inside
+     * the protected area.
+     * @param event block place event
+     */
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
         if (event.getPlayer().getGameMode() == GameMode.SURVIVAL && this.checkShouldProtectBlock(event)) {
             event.setCancelled(true);
+        }
+    }
+
+    /**
+     * Dispenser is dispensing a mine cart in protected area, the player is taking a mine cart,
+     * ensure another is in it ready for dispensing.
+     * @param event block dispense event
+     */
+    @EventHandler
+    public void onDispenseMineCart(BlockDispenseEvent event)
+    {
+        if (checkShouldProtectBlock(event) && event.getItem().getType() == Material.MINECART) {
+            Dispenser dispenser = (Dispenser) event.getBlock();
+            dispenser.getInventory().addItem(new ItemStack(Material.MINECART));
         }
     }
 
@@ -61,7 +89,7 @@ public class BlockEvent implements Listener {
 
     /**
      * If using a piston to affect a TNT block inside the protected area, replace the TNT block with slime!
-     * @param event
+     * @param event piston extend event
      */
     @EventHandler
     public void onBlockPistonExtend(BlockPistonExtendEvent event) {

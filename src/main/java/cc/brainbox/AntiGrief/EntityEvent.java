@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -34,11 +35,11 @@ public class EntityEvent implements Listener {
                     )
                 ) {
                 event.setCancelled(true);
-                if (event.getEntity() instanceof Player) {
+                if (event.getEntity() instanceof Player && !p.isOp()) {
                     p.sendMessage(ChatColor.RED + "Calm down! You cannot PVP inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
-                } else if (event.getEntity() instanceof ItemFrame) {
+                } else if (event.getEntity() instanceof ItemFrame && !p.isOp()) {
                     p.sendMessage(ChatColor.RED + "Hands off! You cannot destroy item frames inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
-                } else if (event.getEntity() instanceof Villager) {
+                } else if (event.getEntity() instanceof Villager && !p.isOp()) {
                     p.sendMessage(ChatColor.RED + "Not cool! Don't attack villagers inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
                 }
             }
@@ -48,8 +49,8 @@ public class EntityEvent implements Listener {
     @EventHandler
     public void onPlayerItemFrameChange(PlayerItemFrameChangeEvent event) {
         Location l = event.getItemFrame().getLocation();
-        if (pc.isProtected(l.getBlockX(), l.getBlockZ(), event.getItemFrame().getWorld())) {
-            Player p = event.getPlayer();
+        Player p = event.getPlayer();
+        if (!p.isOp() && pc.isProtected(l.getBlockX(), l.getBlockZ(), event.getItemFrame().getWorld())) {
             event.setCancelled(true);
             p.sendMessage(ChatColor.RED + "You cannot loot item frames inside a " + ChatColor.GREEN + "safe zone" + ChatColor.RED + "!");
         }

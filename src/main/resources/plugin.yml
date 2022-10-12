@@ -14,3 +14,7 @@ commands:
     description: Teleports you into a random wilderness location away from the safe zone
     usage: /wilderness
     permission: AntiGriefPlugin.permission
+  map:
+    description: Gives a level 4 map
+    usage: /map
+    permission: AntiGriefPlugin.map

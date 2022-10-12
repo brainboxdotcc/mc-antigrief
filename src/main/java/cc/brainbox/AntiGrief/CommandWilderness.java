@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class WildernessCommand implements CommandExecutor {
+public class CommandWilderness implements CommandExecutor {
 
     ProtectedChecker pc = new ProtectedChecker();
 
